@@ -387,14 +387,38 @@
   <data name="DaysAgo" xml:space="preserve">
     <value>{0, plural, one {# day ago} other {# days ago}}</value>
   </data>
+  <data name="DaysAgo_Singular" xml:space="preserve">
+    <value>1 day ago</value>
+  </data>
+  <data name="DaysAgo_Plural" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
   <data name="HoursAgo" xml:space="preserve">
     <value>{0, plural, one {# hour ago} other {# hours ago}}</value>
+  </data>
+  <data name="HoursAgo_Singular" xml:space="preserve">
+    <value>1 hour ago</value>
+  </data>
+  <data name="HoursAgo_Plural" xml:space="preserve">
+    <value>{0} hours ago</value>
   </data>
   <data name="MinutesAgo" xml:space="preserve">
     <value>{0, plural, one {# minute ago} other {# minutes ago}}</value>
   </data>
+  <data name="MinutesAgo_Singular" xml:space="preserve">
+    <value>1 minute ago</value>
+  </data>
+  <data name="MinutesAgo_Plural" xml:space="preserve">
+    <value>{0} minutes ago</value>
+  </data>
   <data name="SecondsAgo" xml:space="preserve">
     <value>{0, plural, one {# second ago} other {# seconds ago}}</value>
+  </data>
+  <data name="SecondsAgo_Singular" xml:space="preserve">
+    <value>1 second ago</value>
+  </data>
+  <data name="SecondsAgo_Plural" xml:space="preserve">
+    <value>{0} seconds ago</value>
   </data>
   <data name="Now" xml:space="preserve">
     <value>立刻</value>
@@ -488,8 +512,8 @@
   <data name="TabStripDragAndDropUIOverrideCaption" xml:space="preserve">
     <value>將索引標籤移至此處</value>
   </data>
-  <data name="syncStatusColumn.Header" xml:space="preserve">
-    <value>狀態</value>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
   </data>
   <data name="SettingsPreferencesSystemDefaultLanguageOption" xml:space="preserve">
     <value>您的系統語言</value>
@@ -1058,6 +1082,9 @@
   <data name="ToggleInfoPaneDescription" xml:space="preserve">
     <value>開啟資料視窗以查看詳細資料/預覽視窗</value>
   </data>
+  <data name="ToggleToolbar" xml:space="preserve">
+    <value>Toggle the Toolbar</value>
+  </data>
   <data name="DetailsPanePreviewNotAvaliableText" xml:space="preserve">
     <value>無法預覽</value>
   </data>
@@ -1559,8 +1586,8 @@
   <data name="SecurityAdvancedReplaceChildPermissions2.ToolTipService.ToolTip" xml:space="preserve">
     <value>覆蓋所有子物件的權限為此父物件的可繼承權限</value>
   </data>
-  <data name="NavigationToolbarClosePane.Label" xml:space="preserve">
-    <value>關閉畫面</value>
+  <data name="CloseActivePane" xml:space="preserve">
+    <value>Close active pane</value>
   </data>
   <data name="EnterCompactOverlay" xml:space="preserve">
     <value>進入精簡懸浮模式</value>
@@ -1820,8 +1847,8 @@
   <data name="CompatibilityNoReducedColor" xml:space="preserve">
     <value>不使用色彩簡化</value>
   </data>
-  <data name="ThirdPartyLicenses" xml:space="preserve">
-    <value>第三方授權條款</value>
+  <data name="ThirdPartyLibraries" xml:space="preserve">
+    <value>Third party libraries</value>
   </data>
   <data name="SettingsSetAsDefaultFileManagerDescription" xml:space="preserve">
     <value>此項設定會修改您的系統檔案並有可能會有未預期的副作用。我們對於可能會發生的問題並不負責。請您僅在認知到這個動作可能帶來的問題的情況下才繼續進行。</value>
@@ -2648,8 +2675,8 @@
   <data name="OpenNewPaneDescription" xml:space="preserve">
     <value>開啟新畫面</value>
   </data>
-  <data name="ClosePaneDescription" xml:space="preserve">
-    <value>Close right pane</value>
+  <data name="CloseActivePaneDescription" xml:space="preserve">
+    <value>Close active pane</value>
   </data>
   <data name="FocusLeftPane" xml:space="preserve">
     <value>Focus left pane</value>
@@ -3828,5 +3855,15 @@
   </data>
   <data name="EditInNotepadDescription" xml:space="preserve">
     <value>Edit the selected file in Notepad</value>
+  </data>
+  <data name="PropertyDimensionsColon" xml:space="preserve">
+    <value>Dimensions:</value>
+  </data>
+  <data name="StatusWithColon" xml:space="preserve">
+    <value>Status:</value>
+  </data>
+  <data name="ShowToolbar" xml:space="preserve">
+    <value>Show Toolbar</value>
+    <comment>Setting that controls if the Toolbar is shown in the main view</comment>
   </data>
 </root>

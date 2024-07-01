@@ -103,8 +103,7 @@
 					Background="Transparent"
 					IsRightTapEnabled="True"
 					Loaded="Grid_Loaded"
-					PointerEntered="Grid_PointerEntered"
-					ToolTipService.ToolTip="{x:Bind ItemTooltipText, Mode=OneWay}">
+					PointerEntered="Grid_PointerEntered">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto" />
 						<RowDefinition Height="*" />
@@ -186,17 +185,20 @@
 							<ColumnDefinition Width="*" />
 						</Grid.ColumnDefinitions>
 
-						<uc:OpacityIcon
+						<Border
 							x:Name="CloudDriveSyncStatusGlyph"
 							Grid.Column="0"
-							Width="16"
-							Height="16"
-							Margin="0,0,4,0"
 							HorizontalAlignment="Left"
 							x:Load="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).LoadSyncStatus, Mode=OneWay}"
 							x:Phase="2"
-							Style="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).OpacityIcon, Mode=OneWay}"
-							ToolTipService.ToolTip="{x:Bind SyncStatusUI.SyncStatusString, Mode=OneWay}" />
+							Background="Transparent"
+							ToolTipService.ToolTip="{x:Bind SyncStatusUI.SyncStatusString, Mode=OneWay}">
+							<uc:OpacityIcon
+								Width="16"
+								Height="16"
+								Margin="0,0,4,0"
+								Style="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).OpacityIcon, Mode=OneWay}" />
+						</Border>
 
 						<Ellipse
 							Grid.Column="1"
@@ -280,8 +282,7 @@
 					CornerRadius="{StaticResource ControlCornerRadius}"
 					IsRightTapEnabled="True"
 					Loaded="Grid_Loaded"
-					PointerEntered="Grid_PointerEntered"
-					ToolTipService.ToolTip="{x:Bind ItemTooltipText, Mode=OneWay}">
+					PointerEntered="Grid_PointerEntered">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto" />
 						<ColumnDefinition Width="*" />
@@ -395,17 +396,20 @@
 					</TextBox>
 
 					<!--  Cloud Status  -->
-					<uc:OpacityIcon
+					<Border
 						x:Name="CloudDriveSyncStatusGlyph"
 						Grid.Column="2"
-						Width="16"
-						Height="16"
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center"
 						x:Load="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).LoadSyncStatus, Mode=OneWay}"
 						x:Phase="2"
-						Style="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).OpacityIcon, Mode=OneWay}"
-						ToolTipService.ToolTip="{x:Bind SyncStatusUI.SyncStatusString, Mode=OneWay}" />
+						Background="Transparent"
+						ToolTipService.ToolTip="{x:Bind SyncStatusUI.SyncStatusString, Mode=OneWay}">
+						<uc:OpacityIcon
+							Width="16"
+							Height="16"
+							Style="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).OpacityIcon, Mode=OneWay}" />
+					</Border>
 
 					<!--  Visual Status Managing  -->
 					<VisualStateManager.VisualStateGroups>
@@ -436,8 +440,7 @@
 					ColumnSpacing="4"
 					IsRightTapEnabled="True"
 					Loaded="Grid_Loaded"
-					PointerEntered="Grid_PointerEntered"
-					ToolTipService.ToolTip="{x:Bind ItemTooltipText, Mode=OneWay}">
+					PointerEntered="Grid_PointerEntered">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto" />
 						<ColumnDefinition Width="68" />
@@ -459,14 +462,17 @@
 							ToolTipService.ToolTip="{x:Bind FileTagsUI[0].Name, Mode=OneWay}"
 							Visibility="{x:Bind FileTagsUI, Converter={StaticResource EmptyObjectToObjectConverter}, Mode=OneWay}" />
 
-						<uc:OpacityIcon
+						<Border
 							x:Name="CloudDriveSyncStatusGlyph"
-							Width="16"
-							Height="16"
 							x:Phase="2"
-							Style="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).OpacityIcon, Mode=OneWay}"
+							Background="Transparent"
 							ToolTipService.ToolTip="{x:Bind SyncStatusUI.SyncStatusString, Mode=OneWay}"
-							Visibility="{Binding InstanceViewModel.IsPageTypeCloudDrive, ElementName=PageRoot, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+							Visibility="{Binding InstanceViewModel.IsPageTypeCloudDrive, ElementName=PageRoot, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+							<uc:OpacityIcon
+								Width="16"
+								Height="16"
+								Style="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).OpacityIcon, Mode=OneWay}" />
+						</Border>
 					</StackPanel>
 
 					<CheckBox
@@ -739,7 +745,7 @@
 			HorizontalAlignment="Center"
 			VerticalAlignment="Top"
 			Canvas.ZIndex="0"
-			EmptyTextType="{x:Bind ParentShellPageInstance.FilesystemViewModel.EmptyTextType, Mode=OneWay}" />
+			EmptyTextType="{x:Bind ParentShellPageInstance.ShellViewModel.EmptyTextType, Mode=OneWay}" />
 
 		<!--  Invalid Item Name Tip  -->
 		<TeachingTip

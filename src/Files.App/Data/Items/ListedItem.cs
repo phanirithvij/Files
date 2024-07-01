@@ -46,10 +46,10 @@ namespace Files.App.Utils
 				tooltipBuilder.Append($"{"ToolTipDescriptionDate".GetLocalizedResource()} {ItemDateModified}");
 				if (!string.IsNullOrWhiteSpace(FileSize))
 					tooltipBuilder.Append($"{Environment.NewLine}{"SizeLabel".GetLocalizedResource()} {FileSize}");
-				if (!string.IsNullOrWhiteSpace(DimensionsDisplay))
-					tooltipBuilder.Append($"{Environment.NewLine}{"PropertyDimensions".GetLocalizedResource()}: {DimensionsDisplay}");
+				if (SyncStatusUI.SyncStatus is not CloudDriveSyncStatus.FileOnline and not CloudDriveSyncStatus.FolderOnline && !string.IsNullOrWhiteSpace(DimensionsDisplay))
+					tooltipBuilder.Append($"{Environment.NewLine}{"PropertyDimensionsColon".GetLocalizedResource()} {DimensionsDisplay}");
 				if (SyncStatusUI.LoadSyncStatus)
-					tooltipBuilder.Append($"{Environment.NewLine}{"syncStatusColumn/Header".GetLocalizedResource()}: {syncStatusUI.SyncStatusString}");
+					tooltipBuilder.Append($"{Environment.NewLine}{"StatusWithColon".GetLocalizedResource()} {syncStatusUI.SyncStatusString}");
 
 				return tooltipBuilder.ToString();
 			}

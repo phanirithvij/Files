@@ -4,6 +4,7 @@
 using System.Collections.Frozen;
 using System.Collections.Immutable;
 using Files.App.Actions;
+using Microsoft.Extensions.Logging;
 
 namespace Files.App.Data.Commands
 {
@@ -54,6 +55,7 @@ namespace Files.App.Data.Commands
 		public IRichCommand TogglePreviewPane => commands[CommandCodes.TogglePreviewPane];
 		public IRichCommand ToggleDetailsPane => commands[CommandCodes.ToggleDetailsPane];
 		public IRichCommand ToggleInfoPane => commands[CommandCodes.ToggleInfoPane];
+		public IRichCommand ToggleToolbar => commands[CommandCodes.ToggleToolbar];
 		public IRichCommand SelectAll => commands[CommandCodes.SelectAll];
 		public IRichCommand InvertSelection => commands[CommandCodes.InvertSelection];
 		public IRichCommand ClearSelection => commands[CommandCodes.ClearSelection];
@@ -190,7 +192,7 @@ namespace Files.App.Data.Commands
 		public IRichCommand NextTab => commands[CommandCodes.NextTab];
 		public IRichCommand CloseSelectedTab => commands[CommandCodes.CloseSelectedTab];
 		public IRichCommand OpenNewPane => commands[CommandCodes.OpenNewPane];
-		public IRichCommand ClosePane => commands[CommandCodes.ClosePane];
+		public IRichCommand CloseActivePane => commands[CommandCodes.CloseActivePane];
 		public IRichCommand FocusLeftPane => commands[CommandCodes.FocusLeftPane];
 		public IRichCommand FocusRightPane => commands[CommandCodes.FocusRightPane];
 		public IRichCommand OpenFileLocation => commands[CommandCodes.OpenFileLocation];
@@ -237,6 +239,7 @@ namespace Files.App.Data.Commands
 			[CommandCodes.TogglePreviewPane] = new TogglePreviewPaneAction(),
 			[CommandCodes.ToggleDetailsPane] = new ToggleDetailsPaneAction(),
 			[CommandCodes.ToggleInfoPane] = new ToggleInfoPaneAction(),
+			[CommandCodes.ToggleToolbar] = new ToggleToolbarAction(),
 			[CommandCodes.SelectAll] = new SelectAllAction(),
 			[CommandCodes.InvertSelection] = new InvertSelectionAction(),
 			[CommandCodes.ClearSelection] = new ClearSelectionAction(),
@@ -373,7 +376,7 @@ namespace Files.App.Data.Commands
 			[CommandCodes.NextTab] = new NextTabAction(),
 			[CommandCodes.CloseSelectedTab] = new CloseSelectedTabAction(),
 			[CommandCodes.OpenNewPane] = new OpenNewPaneAction(),
-			[CommandCodes.ClosePane] = new ClosePaneAction(),
+			[CommandCodes.CloseActivePane] = new CloseActivePaneAction(),
 			[CommandCodes.FocusLeftPane] = new FocusLeftPaneAction(),
 			[CommandCodes.FocusRightPane] = new FocusRightPaneAction(),
 			[CommandCodes.OpenFileLocation] = new OpenFileLocationAction(),
@@ -391,25 +394,26 @@ namespace Files.App.Data.Commands
 		/// </summary>
 		private void OverwriteKeyBindings()
 		{
+			var allCommands = commands.Values.OfType<ActionCommand>();
+
 			if (ActionsSettingsService.ActionsV2 is null)
 			{
-				foreach (var command in commands.Values.OfType<ActionCommand>())
-				{
-					command.RestoreKeyBindings();
-				}
+				allCommands.ForEach(x => x.RestoreKeyBindings());
 			}
 			else
 			{
-				foreach (var command in commands.Values.OfType<ActionCommand>())
+				foreach (var command in allCommands)
 				{
 					var customizedKeyBindings = ActionsSettingsService.ActionsV2.FindAll(x => x.CommandCode == command.Code.ToString());
 
 					if (customizedKeyBindings.IsEmpty())
 					{
+						// Could not find customized key bindings for the command
 						command.RestoreKeyBindings();
 					}
 					else if (customizedKeyBindings.Count == 1 && customizedKeyBindings[0].KeyBinding == string.Empty)
 					{
+						// Do not assign any key binding even though there're default keys pre-defined
 						command.OverwriteKeyBindings(HotKeyCollection.Empty);
 					}
 					else
@@ -420,9 +424,62 @@ namespace Files.App.Data.Commands
 				}
 			}
 
-			_allKeyBindings = commands.Values
-				.SelectMany(command => command.HotKeys, (command, hotKey) => (Command: command, HotKey: hotKey))
-				.ToImmutableDictionary(item => item.HotKey, item => item.Command);
+			try
+			{
+				// Set collection of a set of command code and key bindings to dictionary
+				_allKeyBindings = commands.Values
+					.SelectMany(command => command.HotKeys, (command, hotKey) => (Command: command, HotKey: hotKey))
+					.ToImmutableDictionary(item => item.HotKey, item => item.Command);
+			}
+			catch (ArgumentException ex)
+			{
+				// The keys are not necessarily all different because they can be set manually in text editor
+				// ISSUE: https://github.com/files-community/Files/issues/15331
+
+				var flat = commands.Values.SelectMany(x => x.HotKeys).Select(x => x.LocalizedLabel);
+				var duplicates = flat.GroupBy(x => x).Where(x => x.Count() > 1).Select(group => group.Key);
+
+				foreach (var item in duplicates)
+				{
+					if (!string.IsNullOrEmpty(item))
+					{
+						var occurrences = allCommands.Where(x => x.HotKeys.Select(x => x.LocalizedLabel).Contains(item));
+
+						// Restore the defaults for all occurrences in our cache
+						occurrences.ForEach(x => x.RestoreKeyBindings());
+
+						// Get all customized key bindings from user settings json
+						var actions =
+							ActionsSettingsService.ActionsV2 is not null
+								? new List<ActionWithParameterItem>(ActionsSettingsService.ActionsV2)
+								: [];
+
+						// Remove the duplicated key binding from user settings JSON file
+						actions.RemoveAll(x => x.KeyBinding.Contains(item));
+
+						// Reset
+						ActionsSettingsService.ActionsV2 = actions;
+					}
+				}
+
+				// Set collection of a set of command code and key bindings to dictionary
+				_allKeyBindings = commands.Values
+					.SelectMany(command => command.HotKeys, (command, hotKey) => (Command: command, HotKey: hotKey))
+					.ToImmutableDictionary(item => item.HotKey, item => item.Command);
+
+				App.Logger.LogWarning(ex, "The app found some keys in different commands are duplicated and are using default key bindings for those commands.");
+			}
+			catch (Exception ex)
+			{
+				allCommands.ForEach(x => x.RestoreKeyBindings());
+
+				// Set collection of a set of command code and key bindings to dictionary
+				_allKeyBindings = commands.Values
+					.SelectMany(command => command.HotKeys, (command, hotKey) => (Command: command, HotKey: hotKey))
+					.ToImmutableDictionary(item => item.HotKey, item => item.Command);
+
+				App.Logger.LogWarning(ex, "The app is temporarily using default key bindings for all because of a serious error of assigning custom keys.");
+			}
 		}
 
 		public static HotKeyCollection GetDefaultKeyBindings(IAction action)

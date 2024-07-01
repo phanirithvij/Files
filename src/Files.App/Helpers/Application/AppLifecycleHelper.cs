@@ -5,6 +5,7 @@ using CommunityToolkit.WinUI.Helpers;
 using Files.App.Helpers.Application;
 using Files.App.Services.SizeProvider;
 using Files.App.Storage.Storables;
+using Files.App.Utils.Logger;
 using Files.App.ViewModels.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -138,6 +139,7 @@ namespace Files.App.Helpers
 				.UseEnvironment(AppLifecycleHelper.AppEnvironment.ToString())
 				.ConfigureLogging(builder => builder
 					.AddProvider(new FileLoggerProvider(Path.Combine(ApplicationData.Current.LocalFolder.Path, "debug.log")))
+					.AddProvider(new SentryLoggerProvider())
 					.SetMinimumLevel(LogLevel.Information))
 				.ConfigureServices(services => services
 					// Settings services
@@ -267,11 +269,9 @@ namespace Files.App.Helpers
 
 				SentrySdk.CaptureException(ex, scope =>
 				{
-					scope.User.Id = generalSettingsService.UserId;
+					scope.User.Id = generalSettingsService?.UserId;
+					scope.Level = SentryLevel.Fatal;
 				});
-
-
-				SentrySdk.CaptureException(ex);
 
 				formattedException.AppendLine($">>>> HRESULT: {ex.HResult}");
 
@@ -310,7 +310,7 @@ namespace Files.App.Helpers
 
 			// Save the current tab list in case it was overwriten by another instance
 			SaveSessionTabs();
-			App.Logger.LogError(ex, ex?.Message ?? "An unhandled error occurred.");
+			App.Logger?.LogError(ex, ex?.Message ?? "An unhandled error occurred.");
 
 			if (!showToastNotification)
 				return;
